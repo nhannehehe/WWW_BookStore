@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Đơn Hàng Của Tôi</title>
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" th:href="@{/css/my-orders-style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<section>
+    <div class="orders-wrapper">
+        <div class="container pt-5 pb-5">
+            <div class="row">
+                <!-- Page Header -->
+                <div class="orders-header">
+                    <h2>
+                        <i class="fa-solid fa-box"></i>
+                        Đơn Hàng Của Tôi
+                    </h2>
+                </div>
+
+                <!-- Success Message -->
+                <div class="col-12 text-center mb-3">
+                    <th:block th:if="${session.succMsg}">
+                        <div class="alert-custom alert-success-custom">
+                            <i class="fa-solid fa-circle-check me-2"></i>
+                            [[${session.succMsg}]]
+                        </div>
+                        <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <!-- Error Message -->
+                    <th:block th:if="${session.errorMsg}">
+                        <div class="alert-custom alert-danger-custom">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i>
+                            [[${session.errorMsg}]]
+                        </div>
+                        <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="col-12">
+                    <th:block th:if="${orders != null && orders.size() > 0}">
+                        <div class="orders-card">
+                            <div class="table-responsive">
+                                <table class="table table-orders">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                <i class="fa-solid fa-hashtag me-2"></i>Mã đơn hàng
+                                            </th>
+                                            <th scope="col">
+                                                <i class="fa-solid fa-calendar me-2"></i>Ngày đặt
+                                            </th>
+                                            <th scope="col">
+                                                <i class="fa-solid fa-box-open me-2"></i>Sản phẩm
+                                            </th>
+                                            <th scope="col">
+                                                <i class="fa-solid fa-money-bill me-2"></i>Chi tiết giá
+                                            </th>
+                                            <th scope="col">
+                                                <i class="fa-solid fa-circle-info me-2"></i>Trạng thái
+                                            </th>
+                                            <th scope="col">
+                                                <i class="fa-solid fa-bars me-2"></i>Thao tác
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="o:${orders}">
+                                            <!-- Order ID -->
+                                            <th scope="row" data-label="Mã đơn hàng">
+                                                <span class="order-id">[[${o.orderId}]]</span>
+                                            </th>
+
+                                            <!-- Order Date -->
+                                            <td data-label="Ngày đặt">
+                                                <span class="order-date">
+                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                    [[${o.orderDate}]]
+                                                </span>
+                                            </td>
+
+                                            <!-- Product Details -->
+                                            <td data-label="Sản phẩm">
+                                                <div class="product-title">[[${o.product.title}]]</div>
+                                            </td>
+
+                                            <!-- Price Details -->
+                                            <td data-label="Chi tiết giá">
+                                                <div class="price-details">
+                                                    <div class="price-row">
+                                                        <span class="price-label">Số lượng:</span>
+                                                        <span class="price-value">[[${o.quantity}]]</span>
+                                                    </div>
+                                                    <div class="price-row">
+                                                        <span class="price-label">Đơn giá:</span>
+                                                        <span class="price-value">
+                                                            <span th:text="${#numbers.formatDecimal(o.price, 0, 'COMMA', 0, 'POINT')}"></span>đ
+                                                        </span>
+                                                    </div>
+                                                    <div class="price-row">
+                                                        <span class="price-label">Tổng tiền:</span>
+                                                        <span class="price-value total-value">
+                                                            <span th:text="${#numbers.formatDecimal(o.quantity * o.price, 0, 'COMMA', 0, 'POINT')}"></span>đ
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <!-- Status -->
+                                            <td data-label="Trạng thái">
+                                                <span th:class="'status-badge ' + 
+                                                    ${o.status == 'Pending' ? 'status-pending' : 
+                                                    (o.status == 'In Progress' ? 'status-progress' : 
+                                                    (o.status == 'Order Received' ? 'status-order-received' :
+                                                    (o.status == 'Delivered' || o.status == 'Success' ? 'status-delivered' : 'status-cancelled')))}">
+                                                    <i th:class="'fa-solid ' + 
+                                                        ${o.status == 'Pending' ? 'fa-clock' : 
+                                                        (o.status == 'In Progress' ? 'fa-truck' : 
+                                                        (o.status == 'Order Received' ? 'fa-box' :
+                                                        (o.status == 'Delivered' || o.status == 'Success' ? 'fa-circle-check' : 'fa-circle-xmark')))}"></i>
+                                                    <span th:text="${o.status == 'Pending' ? 'Chờ xử lý' : 
+                                                        (o.status == 'In Progress' ? 'Đang giao' : 
+                                                        (o.status == 'Order Received' ? 'Đã nhận đơn' :
+                                                        (o.status == 'Delivered' ? 'Đã giao' : 
+                                                        (o.status == 'Success' ? 'Thành công' : 'Đã hủy'))))}"></span>
+                                                </span>
+                                            </td>
+
+                                            <!-- Action -->
+                                            <td data-label="Thao tác">
+                                                <th:block th:if="${o.status != 'Cancelled'}">
+                                                    <a th:href="@{'/user/update-status?id='+${o.id}+'&st=6'}"
+                                                       class="btn-cancel">
+                                                        <i class="fa-solid fa-ban"></i>
+                                                        Hủy đơn
+                                                    </a>
+                                                </th:block>
+                                                <th:block th:unless="${o.status != 'Cancelled'}">
+                                                    <a href="#" class="btn-cancel disabled">
+                                                        <i class="fa-solid fa-ban"></i>
+                                                        Đã hủy
+                                                    </a>
+                                                </th:block>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </th:block>
+
+                    <!-- Empty State -->
+                    <th:block th:if="${orders == null || orders.size() == 0}">
+                        <div class="orders-card">
+                            <div class="empty-orders">
+                                <i class="fa-solid fa-box-open"></i>
+                                <h4>Chưa có đơn hàng nào</h4>
+                                <p>Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm ngay!</p>
+                                <a href="/products" class="btn-shop-now">
+                                    <i class="fa-solid fa-shopping-bag"></i>
+                                    Mua sắm ngay
+                                </a>
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

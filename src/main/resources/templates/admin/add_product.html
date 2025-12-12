@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Sản Phẩm</title>
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            padding: 2rem !important;
+            border-radius: 15px !important;
+            margin-bottom: 2rem !important;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3) !important;
+        }
+
+        .card-sh {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+            border-radius: 15px !important;
+            border: none !important;
+            background: white !important;
+        }
+
+        .mt-5 {
+            margin-top: 5% !important;
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px !important;
+            border: 2px solid #e0e0e0 !important;
+            padding: 0.75rem 1rem !important;
+            transition: all 0.3s !important;
+            font-size: 0.95rem !important;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .icon-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-label i {
+            color: #667eea;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 0.875rem !important;
+            font-weight: 600 !important;
+            font-size: 1rem !important;
+            transition: all 0.3s !important;
+            color: white !important;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-check {
+            padding-left: 0;
+        }
+
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .alert-message {
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            animation: slideIn 0.5s ease-out;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            transform: translateX(-5px);
+        }
+
+        .section-divider {
+            border-top: 2px solid #e0e0e0;
+            margin: 2rem 0;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input[type="file"].form-control {
+            padding: 0.5rem 1rem;
+        }
+
+        input[type="number"].form-control {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="container p-4 mt-5">
+            <!-- Page Header -->
+            <div class="page-header text-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Thêm Sản Phẩm Mới
+                </h2>
+            </div>
+
+            <a href="/admin/" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại trang quản trị
+            </a>
+
+            <div class="row">
+                <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+                    <!-- Alert Messages -->
+                    <th:block th:if="${session.succMsg}">
+                        <div class="alert alert-success alert-message">
+                            <i class="fas fa-check-circle me-2" style="font-size: 1.25rem;"></i>
+                            <span>[[${session.succMsg}]]</span>
+                        </div>
+                        <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <th:block th:if="${session.errorMsg}">
+                        <div class="alert alert-danger alert-message">
+                            <i class="fas fa-exclamation-circle me-2" style="font-size: 1.25rem;"></i>
+                            <span>[[${session.errorMsg}]]</span>
+                        </div>
+                        <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <div class="card card-sh">
+                        <div class="card-body">
+                            <form id="productForm" action="/admin/saveProduct" method="post"
+                                enctype="multipart/form-data">
+
+                                <!-- Tiêu đề sản phẩm -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-heading"></i>
+                                        Tiêu đề sản phẩm
+                                    </label>
+                                    <input type="text" name="title" class="form-control"
+                                        placeholder="Nhập tiêu đề sản phẩm (ví dụ: Dế Mèn Phiêu Lưu Ký)" required>
+                                </div>
+
+                                <!-- Mô tả -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-align-left"></i>
+                                        Mô tả
+                                    </label>
+                                    <textarea rows="4" class="form-control" name="description"
+                                        placeholder="Nhập mô tả chi tiết về sản phẩm..." required></textarea>
+                                </div>
+
+                                <div class="section-divider"></div>
+
+                                <!-- Danh mục & Giá -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-layer-group"></i>
+                                            Danh mục
+                                        </label>
+                                        <select id="categoryId" name="categoryId" class="form-control form-select"
+                                            required>
+                                            <option value="" disabled selected>-- Chọn danh mục --</option>
+                                            <option th:each="category : ${categories}" th:value="${category.id}"
+                                                th:text="${category.name}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-dollar-sign"></i>
+                                            Giá (VND)
+                                        </label>
+                                        <input type="number" name="price" class="form-control" placeholder="0.00"
+                                            min="0.01" step="0.01" required>
+                                    </div>
+                                </div>
+
+                                <!-- Tồn kho & Giảm giá -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-boxes"></i>
+                                            Số lượng tồn kho
+                                        </label>
+                                        <input type="number" name="stock" class="form-control" placeholder="0" min="0"
+                                            step="1" required>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label">
+                                            <i class="fas fa-percent"></i>
+                                            Giảm giá (%)
+                                        </label>
+                                        <input type="number" name="discount" class="form-control" placeholder="0"
+                                            min="0" max="100" step="1" value="0">
+                                    </div>
+                                </div>
+
+                                <div class="section-divider"></div>
+
+                                <!-- Trạng thái -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-toggle-on"></i>
+                                        Trạng thái
+                                    </label>
+                                    <div class="radio-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" checked value="true"
+                                                name="isActive" id="statusActive">
+                                            <label class="form-check-label" for="statusActive">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                                Kích hoạt
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isActive" value="false"
+                                                id="statusInactive">
+                                            <label class="form-check-label" for="statusInactive">
+                                                <i class="fas fa-times-circle text-danger"></i>
+                                                Không kích hoạt
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hình ảnh sản phẩm -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-image"></i>
+                                        Hình ảnh sản phẩm
+                                    </label>
+                                    <input type="file" name="file" class="form-control" accept="image/*" required>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Định dạng hỗ trợ: JPG, PNG, WEBP (Tối đa 5MB)
+                                    </small>
+                                </div>
+
+                                <!-- Nút lưu -->
+                                <button type="submit" class="btn btn-primary btn-submit col-md-12 mt-3">
+                                    <i class="fas fa-save me-2"></i>
+                                    Lưu sản phẩm
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

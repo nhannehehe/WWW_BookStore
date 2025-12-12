@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh Sửa Danh Mục</title>
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            padding: 2rem !important;
+            border-radius: 15px !important;
+            margin-bottom: 2rem !important;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3) !important;
+        }
+
+        .card-sh {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            border: none;
+            background: white;
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .icon-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-label i {
+            color: #667eea;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.875rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-check {
+            padding-left: 0;
+        }
+
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .alert-message {
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            animation: slideIn 0.5s ease-out;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            transform: translateX(-5px);
+        }
+
+        .current-image {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 3px solid #e0e0e0;
+            padding: 0.5rem;
+            background: white;
+        }
+
+        .image-preview-container {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        input[type="file"].form-control {
+            padding: 0.5rem 1rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .section-divider {
+            border-top: 2px solid #e0e0e0;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="container p-4 mt-3">
+            <!-- Page Header -->
+            <div class="page-header text-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    Chỉnh Sửa Danh Mục
+                </h2>
+            </div>
+
+            <a href="/admin/category" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại danh mục
+            </a>
+
+            <div class="row">
+                <div class="col-md-6 offset-md-3 col-lg-4 offset-lg-4">
+                    <div class="card card-sh">
+                        <div class="card-body">
+                            <!-- Alert Messages -->
+                            <th:block th:if="${session.succMsg}">
+                                <div class="alert alert-success alert-message">
+                                    <i class="fas fa-check-circle me-2" style="font-size: 1.25rem;"></i>
+                                    <span>[[${session.succMsg}]]</span>
+                                </div>
+                                <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+
+                            <th:block th:if="${session.errorMsg}">
+                                <div class="alert alert-danger alert-message">
+                                    <i class="fas fa-exclamation-circle me-2" style="font-size: 1.25rem;"></i>
+                                    <span>[[${session.errorMsg}]]</span>
+                                </div>
+                                <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                            </th:block>
+
+                            <form id="editCategoryForm" action="/admin/updateCategory" method="post"
+                                enctype="multipart/form-data">
+                                <input type="hidden" name="id" th:value="${category.id}">
+
+                                <!-- Tên danh mục -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-tag"></i>
+                                        Tên danh mục
+                                    </label>
+                                    <input type="text" name="name" th:value="${category.name}" class="form-control"
+                                        placeholder="Nhập tên danh mục" required>
+                                </div>
+
+                                <!-- Trạng thái -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-toggle-on"></i>
+                                        Trạng thái
+                                    </label>
+                                    <div class="radio-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio"
+                                                th:checked="${category.isActive==true}" value="true" name="isActive"
+                                                id="statusActive">
+                                            <label class="form-check-label" for="statusActive">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                                Kích hoạt
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isActive"
+                                                th:checked="${category.isActive==false}" value="false"
+                                                id="statusInactive">
+                                            <label class="form-check-label" for="statusInactive">
+                                                <i class="fas fa-times-circle text-danger"></i>
+                                                Không kích hoạt
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="section-divider"></div>
+
+                                <!-- Tải ảnh mới -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label">
+                                        <i class="fas fa-image"></i>
+                                        Cập nhật ảnh
+                                    </label>
+                                    <input type="file" name="file" class="form-control" accept="image/*">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Để trống nếu muốn giữ nguyên ảnh hiện tại
+                                    </small>
+                                </div>
+
+                                <!-- Xem ảnh hiện tại -->
+                                <div class="image-preview-container mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Ảnh hiện tại
+                                    </label>
+                                    <div class="mt-2">
+                                        <img th:if="${category.imageName != null}"
+                                            th:src="${category.isImageUrl()} ? ${category.imageName} : @{'/img/category_img/' + ${category.imageName}}"
+                                            class="current-image" width="120px" height="120px"
+                                            alt="Ảnh danh mục hiện tại">
+                                        <img th:unless="${category.imageName != null}"
+                                            th:src="@{/img/category_img/default-category.jpg}" class="current-image"
+                                            alt="Ảnh danh mục mặc định" width="120px" height="120px">
+                                    </div>
+                                </div>
+
+                                <!-- Nút lưu -->
+                                <button type="submit" class="btn btn-primary btn-submit col-md-12">
+                                    <i class="fas fa-save me-2"></i>
+                                    Cập nhật danh mục
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

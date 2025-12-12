@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ Hàng</title>
+</head>
+
+<body>
+    <section>
+        <div class="cart-wrapper">
+            <div class="container-fluid pt-5 pb-5 px-3 px-md-5">
+                <div class="card card-sh">
+                    <!-- Header -->
+                    <div class="card-header card-header-custom text-center">
+                        <h4 class="mb-0">
+                            <i class="fa-solid fa-cart-shopping title-icon"></i>
+                            Giỏ Hàng Của Bạn
+                        </h4>
+
+                        <!-- Success Message -->
+                        <th:block th:if="${session.succMsg}">
+                            <div class="alert alert-custom alert-success-custom mt-3 mb-0 d-inline-block">
+                                <i class="fa-solid fa-circle-check me-2"></i>
+                                [[${session.succMsg}]]
+                            </div>
+                            <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+
+                        <!-- Error Message -->
+                        <th:block th:if="${session.errorMsg}">
+                            <div class="alert alert-custom alert-danger-custom mt-3 mb-0 d-inline-block">
+                                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                                [[${session.errorMsg}]]
+                            </div>
+                            <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                        </th:block>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="card-body p-0">
+                        <th:block th:if="${carts.size() > 0}">
+                            <div class="table-responsive">
+                                <table class="table table-modern">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">STT</th>
+                                            <th scope="col">Hình ảnh</th>
+                                            <th scope="col">Tên sản phẩm</th>
+                                            <th scope="col">Đơn giá</th>
+                                            <th scope="col" class="text-center">Số lượng</th>
+                                            <th scope="col">Thành tiền</th>
+                                            <th scope="col" class="text-center">Xóa</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="cart,c:${carts}">
+                                            <td>
+                                                <span
+                                                    class="badge bg-primary rounded-pill px-3 py-2">[[${c.count}]]</span>
+                                            </td>
+                                            <td>
+                                                <!-- Handle both URL and local images -->
+                                                <img th:if="${cart.product.image != null}"
+                                                    th:src="${cart.product.isImageUrl()} ? ${cart.product.image} : @{'/img/product_img/' + cart.product.image}"
+                                                    th:alt="${cart.product.title}" class="product-img">
+
+                                                <!-- Show default image if product.image is null -->
+                                                <img th:unless="${cart.product.image != null}"
+                                                    th:src="@{/img/product_img/default-product.jpg}" alt="Ảnh mặc định"
+                                                    class="product-img">
+                                            </td>
+                                            <td class="product-name">[[${cart.product.title}]]</td>
+                                            <td class="price-tag">
+                                                <span
+                                                    th:text="${#numbers.formatDecimal(cart.product.discountPrice, 0, 'COMMA', 0, 'POINT')}"></span>đ
+                                            </td>
+                                            <td class="text-center">
+                                                <a th:href="@{'/admin/cartQuantityUpdate?sy=de&cid='+${cart.id}}"
+                                                    class="qty-btn qty-btn-minus">
+                                                    <i class="fa-solid fa-minus"></i>
+                                                </a>
+                                                <span class="qty-value">[[${cart.quantity}]]</span>
+                                                <th:block th:if="${cart.product.stock > cart.quantity}">
+                                                    <a th:href="@{'/admin/cartQuantityUpdate?sy=in&cid='+${cart.id}}"
+                                                        class="qty-btn qty-btn-plus">
+                                                        <i class="fa-solid fa-plus"></i>
+                                                    </a>
+                                                </th:block>
+                                                <th:block th:unless="${cart.product.stock > cart.quantity}">
+                                                    <span class="qty-btn qty-btn-disabled">
+                                                        <i class="fa-solid fa-plus"></i>
+                                                    </span>
+                                                </th:block>
+                                            </td>
+                                            <td class="total-price-cell">
+                                                <span
+                                                    th:text="${#numbers.formatDecimal(cart.totalPrice, 0, 'COMMA', 0, 'POINT')}"></span>đ
+                                            </td>
+                                            <td class="text-center">
+                                                <a th:href="@{'/admin/cartDeleteProduct?cid='+${cart.id}}"
+                                                    class="delete-btn">
+                                                    <i class="fa-regular fa-trash-can"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Summary Row -->
+                                        <tr class="summary-row">
+                                            <td colspan="4"></td>
+                                            <td class="text-end">
+                                                <span class="total-label">Tổng thanh toán:</span>
+                                            </td>
+                                            <td colspan="2">
+                                                <span class="total-amount"
+                                                    th:text="${#numbers.formatDecimal(totalOrderPrice, 0, 'COMMA', 0, 'POINT')}"></span><span
+                                                    class="total-amount">đ</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Checkout Button -->
+                            <div class="text-center py-4">
+                                <a href="/admin/ordersAdmin" class="btn-checkout">
+                                    <i class="fa-solid fa-credit-card"></i>
+                                    Tiến Hành Thanh Toán
+                                </a>
+                            </div>
+                        </th:block>
+
+                        <!-- Empty Cart -->
+                        <th:block th:if="${carts.size() == 0}">
+                            <div class="empty-cart">
+                                <i class="fa-solid fa-cart-shopping d-block"></i>
+                                <h5 class="text-muted">Giỏ hàng của bạn đang trống</h5>
+                                <p class="text-muted">Hãy thêm sản phẩm vào giỏ hàng nhé!</p>
+                                <a href="/products" class="btn btn-primary mt-3">
+                                    Mua sắm ngay
+                                </a>
+                            </div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

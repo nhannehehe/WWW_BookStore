@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+	<meta charset="ISO-8859-1">
+	<title>Thêm Quản Trị Viên</title>
+	<style>
+		/* Small helper so required fields show a red asterisk like other admin forms */
+		.required-field::after {
+			content: " *";
+			color: #dc3545;
+			font-weight: 700;
+			margin-left: 0.25rem;
+		}
+	</style>
+</head>
+
+<body>
+
+
+	<section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 20px;">
+		<div class="container" style="max-width: 900px;">
+			<div class="row">
+				<div class="col-md-8 mx-auto">
+					<div class="card" style="border: none; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); overflow: hidden;">
+						<div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 30px 30px 20px;">
+							<p class="fs-3 text-center text-white mb-3" style="font-weight: 700; letter-spacing: 0.5px;">Thêm Quản Trị Viên</p>
+							<th:block th:if="${session.succMsg}">
+								<p class="text-white fw-bold" style="background-color: #28a745; padding: 12px 20px; border-radius: 10px; margin: 10px 0; border-left: 4px solid white;">[[${session.succMsg}]]</p>
+								<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+							</th:block>
+
+							<th:block th:if="${session.errorMsg}">
+								<p class="text-white fw-bold" style="background-color: #dc3545; padding: 12px 20px; border-radius: 10px; margin: 10px 0; border-left: 4px solid white;">[[${session.errorMsg}]]</p>
+								<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+							</th:block>
+						</div>
+						<div class="card-body" style="padding: 40px 30px;">
+							<form id="addAdminForm" action="/admin/save-admin" enctype="multipart/form-data" method="post" novalidate>
+								<div class="row g-3">
+									<div class="col-md-6">
+										<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Họ và tên</label>
+										<input required class="form-control" name="name" type="text" placeholder="Nhập họ và tên"
+											minlength="3" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+										<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Vui lòng nhập họ và tên (tối thiểu 3 ký tự).</div>
+									</div>
+
+									<div class="col-md-6">
+										<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Số điện thoại</label>
+										<input required class="form-control" name="mobileNumber" type="tel" placeholder="Nhập số điện thoại"
+											pattern="^[0-9]{9,11}$" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+										<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Số điện thoại gồm 9-11 chữ số.</div>
+									</div>
+
+								</div>
+
+								<div class="mb-3">
+									<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Email</label>
+									<input required class="form-control" name="email" type="email" placeholder="nhap@email.com" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+									<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Vui lòng nhập email hợp lệ.</div>
+								</div>
+
+
+								<div class="row g-3">
+									<div class="col-md-6">
+										<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Địa chỉ</label>
+										<input required class="form-control" name="address" type="text" placeholder="Số nhà/Đường" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+										<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Vui lòng nhập địa chỉ.</div>
+									</div>
+
+									<div class="col-md-6">
+										<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Thành phố</label>
+										<input required class="form-control" name="city" type="text" placeholder="Thành phố" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+										<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Vui lòng nhập thành phố.</div>
+									</div>
+
+								</div>
+
+								<div class="row g-3">
+									<div class="col-md-6">
+										<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Tỉnh/Thành</label>
+										<input required class="form-control" name="state" type="text" placeholder="Tỉnh/Thành" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+										<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Vui lòng nhập Tỉnh/Thành.</div>
+									</div>
+
+									<div class="col-md-6">
+										<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Mã bưu điện</label>
+										<input required class="form-control" name="pincode" type="text" placeholder="Mã bưu điện"
+											pattern="^[0-9]{4,10}$" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+										<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Mã bưu điện gồm 4-10 chữ số.</div>
+									</div>
+
+								</div>
+
+								<div class="row g-3">
+									<div class="col-md-6">
+										<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Mật khẩu</label>
+										<input required class="form-control" name="password" type="password" placeholder="Nhập mật khẩu"
+											minlength="6" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+										<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Mật khẩu tối thiểu 6 ký tự.</div>
+									</div>
+									<div class="col-md-6">
+										<label class="form-label required-field" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Xác nhận mật khẩu</label>
+										<input required class="form-control" name="cpassword" type="password"
+											placeholder="Nhập lại mật khẩu" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+										<div class="invalid-feedback" style="font-size: 13px; color: #dc3545;">Vui lòng nhập lại mật khẩu trùng khớp.</div>
+									</div>
+								</div>
+								<div class="mb-3">
+									<label class="form-label" style="font-weight: 600; color: #333; margin-bottom: 8px; display: block;">Ảnh đại diện</label>
+									<input class="form-control" name="img" type="file" accept="image/*" style="border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px 14px; font-size: 14px; transition: all 0.3s ease; background-color: #f8f9fa;">
+									<small class="text-muted" style="font-size: 12px;">Hỗ trợ JPG, PNG, WEBP (tối đa 5MB).</small>
+								</div>
+								<button type="submit" class="btn text-white w-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 10px; padding: 12px 30px; font-size: 15px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); margin-top: 10px;">Đăng ký</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<style>
+		.form-control:focus {
+			outline: none;
+			border-color: #667eea !important;
+			background-color: #ffffff !important;
+			box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1) !important;
+			transform: translateY(-1px);
+		}
+		.form-control:hover:not(:focus) {
+			border-color: #b0b8d4 !important;
+		}
+		.btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6) !important;
+		}
+		.btn:active {
+			transform: translateY(0);
+		}
+		.required-field::after {
+			content: " *";
+			color: #dc3545;
+			font-weight: 700;
+			margin-left: 0.25rem;
+		}
+	</style>
+	<script>
+		// Bootstrap client-side validation
+		(function () {
+			const form = document.getElementById('addAdminForm');
+			const emailInput = form.querySelector('input[name="email"]');
+			form.addEventListener('submit', function (event) {
+				// custom password match check
+				const pwd = form.querySelector('input[name="password"]').value;
+				const cpwd = form.querySelector('input[name="cpassword"]').value;
+				if (pwd !== cpwd) {
+					event.preventDefault();
+					event.stopPropagation();
+					form.querySelector('input[name="cpassword"]').setCustomValidity('Mật khẩu không trùng khớp');
+				} else {
+					form.querySelector('input[name="cpassword"]').setCustomValidity('');
+				}
+
+				if (!form.checkValidity()) {
+					event.preventDefault();
+					event.stopPropagation();
+				}
+				form.classList.add('was-validated');
+			}, false);
+
+			// async email availability check
+			emailInput.addEventListener('blur', async function () {
+				const email = emailInput.value.trim();
+				if (!email) return;
+				try {
+					const res = await fetch(`/admin/check-email?email=${encodeURIComponent(email)}`);
+					if (!res.ok) return;
+					const data = await res.json();
+					if (data && data.exists) {
+						emailInput.setCustomValidity('Email đã tồn tại. Vui lòng sử dụng email khác');
+					} else {
+						emailInput.setCustomValidity('');
+					}
+				} catch (e) {
+					// network failure: do not block submission
+					emailInput.setCustomValidity('');
+				}
+			});
+
+			// Add focus/blur styling
+			const inputs = form.querySelectorAll('.form-control');
+			inputs.forEach(input => {
+				input.addEventListener('focus', function() {
+					this.style.borderColor = '#667eea';
+					this.style.backgroundColor = '#ffffff';
+				});
+				input.addEventListener('blur', function() {
+					if (!this.value) {
+						this.style.borderColor = '#e0e0e0';
+						this.style.backgroundColor = '#f8f9fa';
+					}
+				});
+			});
+		})();
+	</script>
+</body>
+
+</html>
