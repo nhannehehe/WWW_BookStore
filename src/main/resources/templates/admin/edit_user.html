@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa người dùng</title>
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            padding: 2rem !important;
+            border-radius: 15px !important;
+            margin-bottom: 2rem !important;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3) !important;
+        }
+
+        .card-sh {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+            border-radius: 15px !important;
+            border: none !important;
+            background: white !important;
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .icon-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-label i {
+            color: #667eea;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.875rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .alert-message {
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            animation: slideIn 0.5s ease-out;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            transform: translateX(-5px);
+        }
+
+        .section-divider {
+            border-top: 2px solid #e0e0e0;
+            margin: 2.5rem 0;
+        }
+
+        .current-image {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 3px solid #e0e0e0;
+            padding: 0.5rem;
+            background: white;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="container p-4 mt-3">
+            <!-- Page Header -->
+            <div class="page-header text-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Chỉnh sửa người dùng
+                </h2>
+            </div>
+
+            <!-- Quay lại danh sách người dùng -->
+            <a th:href="@{/admin/users(type=${userType})}" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại danh sách người dùng
+            </a>
+
+            <div class="row">
+                <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+
+                    <!-- Success / Error Message -->
+                    <th:block th:if="${session.succMsg}">
+                        <div class="alert alert-success alert-message">
+                            <i class="fas fa-check-circle me-2" style="font-size: 1.25rem;"></i>
+                            <span>[[${session.succMsg}]]</span>
+                        </div>
+                        <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <th:block th:if="${session.errorMsg}">
+                        <div class="alert alert-danger alert-message">
+                            <i class="fas fa-exclamation-circle me-2" style="font-size: 1.25rem;"></i>
+                            <span>[[${session.errorMsg}]]</span>
+                        </div>
+                        <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <div class="card card-sh">
+                        <div class="card-body">
+
+                            <form th:action="@{/admin/updateUser}" method="post" enctype="multipart/form-data">
+
+                                <input type="hidden" name="id" th:value="${user.id}">
+
+                                <!-- Full Name -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-user"></i> Họ và tên
+                                    </label>
+                                    <input type="text" name="name" th:value="${user.name}" class="form-control"
+                                        placeholder="Nhập họ và tên" required minlength="3">
+                                    <div class="invalid-feedback">Vui lòng nhập họ và tên (tối thiểu 3 ký tự).</div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-envelope"></i> Email
+                                    </label>
+                                    <input type="email" name="email" th:value="${user.email}" class="form-control"
+                                        placeholder="nhap@email.com" required>
+                                    <div class="invalid-feedback">Vui lòng nhập email hợp lệ.</div>
+                                </div>
+
+                                <!-- Mobile Number -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-phone"></i> Số điện thoại
+                                    </label>
+                                    <input type="text" name="mobileNumber" th:value="${user.mobileNumber}"
+                                        class="form-control" placeholder="Nhập số điện thoại" required
+                                        pattern="^[0-9]{9,11}$">
+                                    <div class="invalid-feedback">Số điện thoại gồm 9-11 chữ số.</div>
+                                </div>
+
+                                <div class="section-divider"></div>
+
+                                <!-- Địa chỉ Fields -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-map-marker-alt"></i> Địa chỉ
+                                        </label>
+                                        <input type="text" name="address" th:value="${user.address}"
+                                            class="form-control" placeholder="Số nhà / Đường" required>
+                                        <div class="invalid-feedback">Vui lòng nhập địa chỉ.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-city"></i> Thành phố
+                                        </label>
+                                        <input type="text" name="city" th:value="${user.city}" class="form-control"
+                                            placeholder="Thành phố" required>
+                                        <div class="invalid-feedback">Vui lòng nhập thành phố.</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-globe"></i> Tỉnh / Thành phố
+                                        </label>
+                                        <input type="text" name="state" th:value="${user.state}" class="form-control"
+                                            placeholder="Tỉnh/Thành" required>
+                                        <div class="invalid-feedback">Vui lòng nhập Tỉnh/Thành.</div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-mail-bulk"></i> Mã bưu điện
+                                        </label>
+                                        <input type="text" name="pincode" th:value="${user.pincode}"
+                                            class="form-control" placeholder="Mã bưu điện" required
+                                            pattern="^[0-9]{4,10}$">
+                                        <div class="invalid-feedback">Mã bưu điện gồm 4-10 chữ số.</div>
+                                    </div>
+                                </div>
+
+                                <div class="section-divider"></div>
+
+                                <!-- Role (User / Admin) -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-user-shield"></i> Vai trò
+                                    </label>
+                                    <div class="radio-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="role" value="ROLE_USER"
+                                                th:checked="${user.role == 'ROLE_USER'}" id="roleUser">
+                                            <label class="form-check-label" for="roleUser">
+                                                <i class="fas fa-user text-primary"></i> Người dùng
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="role" value="ROLE_ADMIN"
+                                                th:checked="${user.role == 'ROLE_ADMIN'}" id="roleAdmin">
+                                            <label class="form-check-label" for="roleAdmin">
+                                                <i class="fas fa-user-shield text-warning"></i> Quản trị viên
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Account Status -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-toggle-on"></i> Trạng thái tài khoản
+                                    </label>
+                                    <div class="radio-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isEnable" value="true"
+                                                th:checked="${user.isEnable}" id="statusActive">
+                                            <label class="form-check-label" for="statusActive">
+                                                <i class="fas fa-check-circle text-success"></i> Kích hoạt
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isEnable" value="false"
+                                                th:checked="${!user.isEnable}" id="statusInactive">
+                                            <label class="form-check-label" for="statusInactive">
+                                                <i class="fas fa-times-circle text-danger"></i> Vô hiệu hóa
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- New Password (Admin can set but cannot view old password) -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label">
+                                        <i class="fas fa-lock"></i> Mật khẩu mới
+                                    </label>
+                                    <input type="password" name="newPassword" class="form-control"
+                                        placeholder="Để trống để giữ mật khẩu hiện tại" minlength="6">
+                                </div>
+
+                                <div class="section-divider"></div>
+
+                                <!-- Profile Image -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label">
+                                        <i class="fas fa-image"></i> Cập nhật ảnh đại diện
+                                    </label>
+                                    <input type="file" name="file" class="form-control" accept="image/*">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Để trống nếu muốn giữ nguyên ảnh hiện tại
+                                    </small>
+                                </div>
+
+                                <!-- Current Profile Image -->
+                                <div class="image-preview-container mb-4 text-center">
+                                    <label class="form-label">
+                                        <i class="fas fa-eye me-2"></i> Ảnh đại diện hiện tại
+                                    </label>
+                                    <div class="mt-3">
+                                        <img th:src="${user.profileImage != null && !user.profileImage.isEmpty()} 
+                                            ? @{'/img/profile_img/' + ${user.profileImage}} 
+                                            : @{/img/profile_img/default-avatar.jpg}" class="current-image" width="150"
+                                            height="150" alt="Profile image">
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-primary btn-submit col-12 mt-3"
+                                    id="editUserSubmit">
+                                    <i class="fas fa-save me-2"></i>
+                                    Cập nhật người dùng
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        // Simple Bootstrap validation trigger
+        (function () {
+            const form = document.querySelector('form[th\\:action=\"@{/admin/updateUser}\"]') || document.querySelector('form[action="/admin/updateUser"]');
+            if (!form) return;
+            form.setAttribute('novalidate', '');
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        })();
+    </script>
+</body>
+
+</html>

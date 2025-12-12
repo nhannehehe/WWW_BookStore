@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống kê</title>
+</head>
+<body>
+<section>
+    <div class="container p-5">
+        
+        <p class="text-center fs-3 mt-4">Thống kê</p>
+        <a href="/admin/" class="back-link mb-3 d-inline-block">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại bảng điều khiển
+        </a>
+        <div class="row p-5">
+            <div class="col-md-4 mt-4">
+                <a href="/admin/statistics_year" class="text-decoration-none">
+                    <div class="card card-sh">
+                        <div class="card-body text-center text-primary">
+                            <i class="fa-solid fa-square-poll-vertical fa-3x"></i>
+                            <h4>Thống kê theo năm</h4>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-4 mt-4">
+                <a href="/admin/statistics_month" class="text-decoration-none">
+                    <div class="card card-sh">
+                        <div class="card-body text-center text-primary">
+                            <i class="fa-solid fa-square-poll-vertical fa-3x"></i>
+                            <h4>Thống kê theo tháng</h4>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-4 mt-4">
+                <a href="/admin/statistics_customer" class="text-decoration-none">
+                    <div class="card card-sh">
+                        <div class="card-body text-center text-primary">
+                            <i class="fa-solid fa-square-poll-vertical fa-3x"></i>
+                            <h4>Thống kê theo khách hàng</h4>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-4 mt-4">
+                <a href="/admin/statistics_product" class="text-decoration-none">
+                    <div class="card card-sh">
+                        <div class="card-body text-center text-primary">
+                            <i class="fa-solid fa-square-poll-vertical fa-3x"></i>
+                            <h4>Thống kê theo sản phẩm</h4>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

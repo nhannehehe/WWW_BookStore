@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh Toán</title>
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" th:href="@{/css/checkout-style.css}">
+</head>
+
+<body>
+    <section>
+        <div class="checkout-wrapper">
+            <div class="container pt-5 pb-5">
+                <form action="/admin/save-order" method="post" id="orders" th:object="${userDtls}" novalidate>
+                    <div class="row g-4">
+
+                        <!-- Left Column - Billing Địa chỉ -->
+                        <div class="col-md-6">
+                            <div class="card card-checkout">
+                                <div class="card-header card-header-checkout">
+                                    <h5>
+                                        <i class="fa-solid fa-location-dot header-icon"></i>
+                                        Địa Chỉ Giao Hàng
+                                    </h5>
+                                </div>
+                                <hr class="section-divider">
+                                <div class="form-section">
+                                    <!-- Name Row -->
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label-custom">Họ</label>
+                                            <div class="input-group-custom">
+                                                <i class="fa-solid fa-user input-icon"></i>
+                                                <input type="text" name="firstName" required
+                                                    class="form-control form-control-custom"
+                                                    placeholder="Nhập họ của bạn">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label-custom">Tên</label>
+                                            <div class="input-group-custom">
+                                                <i class="fa-solid fa-user input-icon"></i>
+                                                <input type="text" name="lastName" required
+                                                    class="form-control form-control-custom"
+                                                    placeholder="Nhập tên của bạn">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Email & Phone Row -->
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label-custom">Email</label>
+                                            <div class="input-group-custom">
+                                                <i class="fa-solid fa-envelope input-icon"></i>
+                                                <input type="email" name="email" required
+                                                    class="form-control form-control-custom"
+                                                    th:value="${userDtls.email}" placeholder="example@email.com">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label-custom">Địa chỉ</label>
+                                            <div class="input-group-custom">
+                                                <i class="fa-solid fa-phone input-icon"></i>
+                                                <input type="text" name="mobileNo" required
+                                                    class="form-control form-control-custom"
+                                                    th:value="${userDtls.mobileNumber}" placeholder="0123 456 789">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Địa chỉ Row -->
+                                    <div class="row mb-3">
+                                        <div class="col-12">
+                                            <label class="form-label-custom">Địa chỉ</label>
+                                            <div class="input-group-custom">
+                                                <i class="fa-solid fa-home input-icon"></i>
+                                                <input type="text" name="address" required
+                                                    class="form-control form-control-custom"
+                                                    th:value="${userDtls.address}"
+                                                    placeholder="Số nhà, tên đường, phường/xã">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- City Row -->
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label-custom">Thành phố</label>
+                                            <div class="input-group-custom">
+                                                <i class="fa-solid fa-city input-icon"></i>
+                                                <input type="text" name="city" required
+                                                    class="form-control form-control-custom" th:value="${userDtls.city}"
+                                                    placeholder="Thành phố">
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label-custom">Tỉnh/Thành</label>
+                                            <div class="input-group-custom">
+                                                <i class="fa-solid fa-map input-icon"></i>
+                                                <input type="text" name="state" required
+                                                    class="form-control form-control-custom"
+                                                    th:value="${userDtls.state}" placeholder="Tỉnh/Thành phố">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Pincode Row -->
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label class="form-label-custom">Mã bưu điện</label>
+                                            <div class="input-group-custom">
+                                                <i class="fa-solid fa-hashtag input-icon"></i>
+                                                <input type="number" name="pincode" required
+                                                    class="form-control form-control-custom"
+                                                    th:value="${userDtls.pincode}" placeholder="700000">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column - Order Summary & Payment -->
+                        <div class="col-md-6">
+                            <div class="card card-checkout">
+                                <div class="card-header card-header-checkout">
+                                    <h5>
+                                        <i class="fa-solid fa-receipt header-icon"></i>
+                                        Thông Tin Đơn Hàng
+                                    </h5>
+                                </div>
+                                <hr class="section-divider">
+                                <div class="form-section">
+                                    <!-- Order Summary -->
+                                    <div class="summary-card">
+                                        <table class="summary-table">
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <i class="fa-solid fa-cart-shopping me-2 text-muted"></i>
+                                                        Tạm tính
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            th:text="${#numbers.formatDecimal(orderPrice, 0, 'COMMA', 0, 'POINT')}"></span>đ
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <i class="fa-solid fa-truck me-2 text-muted"></i>
+                                                        Phí vận chuyển
+                                                    </td>
+                                                    <td>30.000đ</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <i class="fa-solid fa-percent me-2 text-muted"></i>
+                                                        Thuế VAT
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            th:text="${#numbers.formatDecimal(tax, 0, 'COMMA', 0, 'POINT')}"></span>đ
+                                                    </td>
+                                                </tr>
+                                                <tr class="total-row">
+                                                    <td>
+                                                        <i class="fa-solid fa-money-bill-wave me-2"></i>
+                                                        <strong>Tổng cộng</strong>
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            th:text="${#numbers.formatDecimal(totalOrderPrice, 0, 'COMMA', 0, 'POINT')}"></span>đ
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Payment Type -->
+                                    <div class="mb-4">
+                                        <label class="form-label-custom mb-3">
+                                            <i class="fa-solid fa-credit-card me-2"></i>
+                                            Phương thức thanh toán
+                                        </label>
+                                        <select required name="paymentType" class="form-control select-custom">
+                                            <option value="">-- Chọn phương thức --</option>
+                                            <option value="COD">💵 Thanh toán khi nhận hàng (COD)</option>
+                                            <option value="ONLINE">💳 Thanh toán trực tuyến</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Place Order Button -->
+                                    <button type="submit" class="btn-place-order">
+                                        <i class="fa-solid fa-check-circle"></i>
+                                        Đặt Hàng Ngay
+                                    </button>
+
+                                    <!-- Security Note -->
+                                    <div class="text-center mt-4">
+                                        <p class="text-muted mb-0" style="font-size: 0.85rem;">
+                                            <i class="fa-solid fa-shield-halved me-1"></i>
+                                            Thông tin của bạn được bảo mật an toàn
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

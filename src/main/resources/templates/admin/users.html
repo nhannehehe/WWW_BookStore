@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+	<meta charset="ISO-8859-1">
+	<title>Danh sách người dùng</title>
+</head>
+
+<body>
+	<section>
+		<style>
+			.users-page .page-header {
+				color: black !important;
+				padding: 2rem !important;
+			}
+
+			.users-page .table-container {
+				background: white !important;
+				padding: 2rem !important;
+				border-radius: 15px !important;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+			}
+
+			.users-page .table thead {
+				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+				color: white !important;
+			}
+
+			.users-page .table thead th {
+				border: none !important;
+				padding: 1rem !important;
+				font-weight: 600 !important;
+				vertical-align: middle !important;
+			}
+
+			.users-page .table tbody td {
+				vertical-align: middle !important;
+				padding: 1rem !important;
+			}
+
+			.users-page .profile-img {
+				border-radius: 10px !important;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+				object-fit: cover !important;
+			}
+
+			.users-page .btn-action {
+				padding: 0.5rem 1rem;
+				border-radius: 8px;
+				font-weight: 600;
+				transition: all 0.3s;
+			}
+
+			.users-page .btn-action:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+			}
+
+			.users-page .status-badge {
+				padding: 0.5rem 1rem;
+				border-radius: 20px;
+				font-weight: 600;
+				font-size: 0.85rem;
+			}
+
+			.users-page .status-active {
+				background: #d4edda;
+				color: #155724;
+			}
+
+			.users-page .status-inactive {
+				background: #f8d7da;
+				color: #721c24;
+			}
+
+			.users-page .alert-custom {
+				border-radius: 10px;
+				padding: 1rem;
+				border-left: 4px solid;
+				animation: slideIn 0.5s ease-out;
+			}
+
+			@keyframes slideIn {
+				from {
+					opacity: 0;
+					transform: translateX(-20px);
+				}
+
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+
+			.users-page .mt-5 {
+				margin-top: 5% !important;
+			}
+		</style>
+		<div class="users-page container-fluid p-4 mt-5">
+			<!-- Page Header -->
+			<div class="page-header text-center">
+				<h2 class="mb-0">
+					<i class="fas fa-users me-2"></i>
+					<span th:if="${userType==1}">Quản Lý Người Dùng</span>
+					<span th:if="${userType==2}">Quản Lý Quản Trị Viên</span>
+				</h2>
+			</div>
+
+			<a href="/admin/" class=" mb-3 d-inline-block">
+				<i class="fas fa-arrow-left me-2"></i>Quay lại bảng điều khiển
+			</a>
+
+			<!-- Alert Messages -->
+			<th:block th:if="${session.succMsg}">
+				<div class="alert alert-success alert-custom border-success">
+					<i class="fas fa-check-circle me-2"></i>
+					[[${session.succMsg}]]
+				</div>
+				<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+			</th:block>
+
+			<th:block th:if="${session.errorMsg}">
+				<div class="alert alert-danger alert-custom border-danger">
+					<i class="fas fa-exclamation-circle me-2"></i>
+					[[${session.errorMsg}]]
+				</div>
+				<th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+			</th:block>
+
+			<!-- Table Container -->
+			<div class="table-container">
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th scope="col"><i class="fas fa-hashtag me-2"></i>STT</th>
+								<th scope="col"><i class="fas fa-image me-2"></i>Ảnh</th>
+								<th scope="col"><i class="fas fa-user me-2"></i>Họ và tên</th>
+								<th scope="col"><i class="fas fa-envelope me-2"></i>Email</th>
+								<th scope="col"><i class="fas fa-phone me-2"></i>Số điện thoại</th>
+								<th scope="col"><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ</th>
+								<th scope="col"><i class="fas fa-toggle-on me-2"></i>Trạng thái</th>
+								<th scope="col"><i class="fas fa-cog me-2"></i>Hành động</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="u,c:${users}">
+								<td><strong>[[${c.count}]]</strong></td>
+								<td>
+									<img th:src="@{'/img/profile_img/'+${u.profileImage}}" width="70px" height="70px" class="profile-img">
+								</td>
+								<td><strong>[[${u.name}]]</strong></td>
+								<td>[[${u.email}]]</td>
+								<td>[[${u.mobileNumber}]]</td>
+								<td>[[${u.address+','+u.city+','+u.state+','+u.pincode}]]</td>
+								<td>
+									<span th:class="${u.isEnable} ? 'status-badge status-active' : 'status-badge status-inactive'">
+										<i th:class="${u.isEnable} ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+										[[${u.isEnable ? 'Kích hoạt' : 'Vô hiệu hóa'}]]
+									</span>
+								</td>
+
+								<td>
+									<!-- Edit always available -->
+									<a th:href="@{/admin/editUser/{id}(id=${u.id},type=${userType})}"
+										class="btn btn-sm btn-primary btn-action me-1">
+										<i class="fas fa-edit me-1"></i>Sửa
+									</a>
+
+									<!-- If user is active -> show only button to make inactive -->
+									<th:block th:if="${u.isEnable}">
+										<a th:href="@{/admin/updateSts(status=${false},id=${u.id},type=${userType})}"
+											class="btn btn-sm btn-warning btn-action me-1">
+											<i class="fas fa-ban me-1"></i>Vô hiệu hóa
+										</a>
+									</th:block>
+
+									<!-- If user is inactive -> show only button to make active -->
+									<th:block th:if="${!u.isEnable}">
+										<a th:href="@{/admin/updateSts(status=${true},id=${u.id},type=${userType})}"
+											class="btn btn-sm btn-success btn-action me-1">
+											<i class="fas fa-check me-1"></i>Kích hoạt
+										</a>
+									</th:block>
+
+									<!-- Show delete only if user has NO orders -->
+									<th:block th:if="${!hasOrdersMap[u.id]}">
+										<a th:href="@{/admin/deleteUser/{id}(id=${u.id},type=${userType})}"
+											onclick="return confirm('Bạn có chắc muốn xóa người dùng này không?');"
+											class="btn btn-sm btn-danger btn-action">
+											<i class="fas fa-trash me-1"></i>Xóa
+										</a>
+									</th:block>
+								</td>
+							</tr>
+
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+	</section>
+</body>
+
+</html>

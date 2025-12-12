@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Thống Kê Khách Hàng Hàng Đầu</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            padding: 2rem !important;
+            border-radius: 15px !important;
+            margin-bottom: 2rem !important;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3) !important;
+        }
+
+        .search-box {
+            background: white !important;
+            padding: 1.5rem !important;
+            border-radius: 15px !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+            margin-bottom: 2rem !important;
+        }
+
+        .table-container {
+            background: white !important;
+            padding: 2rem !important;
+            border-radius: 15px !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+        }
+
+        .table thead th {
+            border: none !important;
+            padding: 1rem !important;
+            font-weight: 600 !important;
+            vertical-align: middle !important;
+        }
+
+        .table tbody td {
+            vertical-align: middle !important;
+            padding: 1rem !important;
+        }
+
+        .product-img {
+            border-radius: 10px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            object-fit: cover !important;
+        }
+
+        .pagination .page-link {
+            border-radius: 8px;
+            margin: 0 3px;
+            color: #667eea;
+            border: 2px solid #e0e0e0;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: #fff;
+        }
+
+        .alert-custom {
+            border-radius: 10px;
+            padding: 1rem;
+            border-left: 4px solid;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .back-link {
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            transform: translateX(-5px);
+        }
+
+        .mt-5 {
+            margin-top: 5% !important;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="container-fluid p-4 mt-5">
+            <!-- Page Header -->
+            <div class="page-header text-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-boxes me-2"></i>
+                    Quản Lý Đơn Hàng
+                </h2>
+            </div>
+
+            <a href="/admin/" class="back-link mb-3 d-inline-block">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại bảng điều khiển
+            </a>
+
+            <!-- Success and Error Messages -->
+            <th:block th:if="${session.succMsg}">
+                <div class="alert alert-success alert-custom border-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    [[${session.succMsg}]]
+                </div>
+                <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <th:block th:if="${session.errorMsg}">
+                <div class="alert alert-danger alert-custom border-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    [[${session.errorMsg}]]
+                </div>
+                <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+            </th:block>
+
+            <!-- Search Form -->
+            <!-- Search Box -->
+            <div class="search-box">
+                <form action="/admin/search-order" method="get">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="orderId" placeholder="Nhập mã đơn hàng"
+                                style="border-radius: 10px; border: 2px solid #e0e0e0; padding: 0.75rem;">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100"
+                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 10px; padding: 0.75rem; font-weight: 600;">
+                                <i class="fas fa-search me-2"></i>Tìm kiếm
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Mã đơn hàng</th>
+                                <th scope="col">Thông tin giao hàng</th>
+                                <th scope="col">Ngày đặt</th>
+                                <th scope="col">Chi tiết sản phẩm</th>
+                                <th scope="col">Giá</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Single Order -->
+                            <th:block th:if="${srch}">
+                                <th:block th:if="${orderDtls != null}">
+                                    <tr>
+                                        <th scope="row">[[${orderDtls.orderId}]]</th>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    <img th:if="${orderDtls.product.image != null}"
+                                                        th:src="${orderDtls.product.isImageUrl()} ? ${orderDtls.product.image} : @{'/img/product_img/' + ${orderDtls.product.image}}"
+                                                        width="80" height="80" class="product-img" />
+                                                    <img th:unless="${orderDtls.product.image != null}"
+                                                        th:src="@{/img/product_img/default-product.jpg}" width="80"
+                                                        height="80" class="product-img" />
+                                                </div>
+                                                <div>
+                                                    <div>Tên: [[${orderDtls.orderAddress.firstName + ' ' +
+                                                        orderDtls.orderAddress.lastName}]]</div>
+                                                    <div>Email: [[${orderDtls.orderAddress.email}]]</div>
+                                                    <div>Số điện thoại: [[${orderDtls.orderAddress.mobileNo}]]</div>
+                                                    <div>Địa chỉ: [[${orderDtls.orderAddress.address}]],
+                                                        [[${orderDtls.orderAddress.city}]]</div>
+                                                    <div>Quận/Huyện: [[${orderDtls.orderAddress.state}]],
+                                                        [[${orderDtls.orderAddress.pincode}]]</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>[[${orderDtls.orderDate}]]</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <img th:if="${orderDtls.product.image != null}"
+                                                        th:src="${orderDtls.product.isImageUrl()} ? ${orderDtls.product.image} : @{'/img/product_img/' + ${orderDtls.product.image}}"
+                                                        width="80" height="80" class="product-img" />
+                                                    <img th:unless="${orderDtls.product.image != null}"
+                                                        th:src="@{/img/product_img/default-product.jpg}" width="80"
+                                                        height="80" class="product-img" />
+                                                </div>
+                                                <div>[[${orderDtls.product.title}]]</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>Số lượng: [[${orderDtls.quantity}]]</div>
+                                            <div>Giá: [[${orderDtls.Price}]]</div>
+                                            <div>Tổng giá: [[${orderDtls.quantity * orderDtls.Price}]]</div>
+                                        </td>
+                                        <td>[[${orderDtls.status}]]</td>
+                                        <td>
+                                            <form action="/admin/update-order-status" method="post" class="mb-2">
+                                                <input type="hidden" name="id" th:value="${orderDtls.id}" />
+                                                <div class="d-flex gap-2">
+                                                    <select class="form-control" name="st"
+                                                        th:disabled="${orderDtls.status == 'Cancelled' || orderDtls.status == 'Delivered'}">
+                                                        <option>--Chọn--</option>
+                                                        <option value="1">Đang xử lý</option>
+                                                        <option value="2">Đã nhận đơn</option>
+                                                        <option value="3">Đã đóng gói</option>
+                                                        <option value="4">Đang giao hàng</option>
+                                                        <option value="5">Đã giao</option>
+                                                        <option value="6">Đã hủy</option>
+                                                    </select>
+                                                    <button class="btn btn-sm btn-primary" type="submit">Cập
+                                                        nhật</button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                                <th:block th:unless="${orderDtls != null}">
+                                    <p class="fs-3 text-center text-danger">[[${errorMsg}]]</p>
+                                </th:block>
+                            </th:block>
+
+                            <!-- Tất cả đơn hàng -->
+                            <th:block th:unless="${srch}">
+                                <tr th:each="o : ${orders}">
+                                    <th scope="row"><a th:href="@{/admin/order/{id}(id=${o.id})}"
+                                            class="text-decoration-none">[[${o.orderId}]]</a></th>
+                                    <td>
+
+                                        Tên: [[${o.orderAddress.firstName + ' ' + o.orderAddress.lastName}]]<br>
+                                        Email: [[${o.orderAddress.email}]]<br>
+                                        Số điện thoại: [[${o.orderAddress.mobileNo}]]<br>
+                                        Địa chỉ: [[${o.orderAddress.address}]], [[${o.orderAddress.city}]]<br>
+                                        Quận/Huyện: [[${o.orderAddress.state}]], [[${o.orderAddress.pincode}]]
+                                    </td>
+                                    <td>[[${o.orderDate}]]</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <img th:if="${o.product.image != null}"
+                                                    th:src="${o.product.isImageUrl()} ? ${o.product.image} : @{'/img/product_img/' + ${o.product.image}}"
+                                                    width="60" height="60" class="product-img" />
+                                                <img th:unless="${o.product.image != null}"
+                                                    th:src="@{/img/product_img/default-product.jpg}" width="60"
+                                                    height="60" class="product-img" />
+                                            </div>
+                                            <div><a th:href="@{'/admin/editProduct/'+${o.product.id}}">[[${o.product.title}]]<a>
+                                            </div>
+                                    </td>
+                                    <td>
+                                        Số lượng: [[${o.quantity}]]<br>
+                                        Giá: [[${o.Price}]]<br>
+                                        Tổng giá: [[${o.quantity * o.Price}]]
+                                    </td>
+                                    <td>[[${o.status}]]</td>
+                                    <td>
+                                        <form action="/admin/update-order-status" method="post">
+                                            <div class="row flex-column">
+                                                <div class="col">
+                                                    <select class="form-control" name="st"
+                                                        th:disabled="${o.status == 'Cancelled' || o.status == 'Delivered'}">
+                                                        <option>--Chọn--</option>
+                                                        <option value="1">Đang xử lý</option>
+                                                        <option value="2">Đã nhận đơn</option>
+                                                        <option value="3">Đã đóng gói</option>
+                                                        <option value="4">Đang giao hàng</option>
+                                                        <option value="5">Đã giao</option>
+                                                        <option value="6">Đã hủy</option>
+                                                    </select>
+                                                </div>
+                                                <input th:value="${o.id}" name="id" type="hidden">
+                                                <div class="col">
+                                                    <button class="btn btn-sm btn-primary" type="submit"
+                                                        th:disabled="${o.status == 'Cancelled' || o.status == 'Delivered'}">
+                                                        Cập nhật
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </th:block>
+                        </tbody>
+                    </table>
+                </div>
+                <th:block th:if="${!srch}">
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <p class="text-muted">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Tổng số đơn hàng: <strong>[[${totalElements}]]</strong>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-end">
+                                    <li class="page-item" th:classappend="${isFirst} ? 'disabled':''">
+                                        <a class="page-link" th:href="@{'/admin/orders?pageNo='+${pageNo-1}}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                    <li th:each="i:${#numbers.sequence(1,totalPages)}" class="page-item"
+                                        th:classappend="${pageNo+1==i}?'active':''">
+                                        <a class="page-link" th:href="@{'/admin/orders?pageNo='+${i-1}}">[[${i}]]</a>
+                                    </li>
+                                    <li class="page-item" th:classappend="${isLast} ? 'disabled':''">
+                                        <a class="page-link" th:href="@{'/admin/orders?pageNo='+${pageNo+1}}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script>
+        function handleSelectChange(selectElement) {
+            const button = selectElement.closest('form').querySelector('button[type="submit"]');
+            button.disabled = selectElement.value === "--select--";
+        }
+
+        document.querySelectorAll('form').forEach(form => {
+            const select = form.querySelector('select[name="st"]');
+            const button = form.querySelector('button[type="submit"]');
+
+            if (select && button) {
+                button.disabled = select.value === "--select--" || select.disabled;
+                select.addEventListener('change', () => handleSelectChange(select));
+            }
+        });
+    </script>
+    <div class="container-fluid p-1 bg-primary text-center text-white" style="margin-top: 250px">
+        <p>ecom.com</p>
+    </div>
+    <!-- Jquery Validation Library  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+    <script type="text/javascript" src="../js/script.js"></script>
+    <!-- End  -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

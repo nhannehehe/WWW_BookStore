@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart Client</title>
+</head>
+<body>
+<h2>Cart JSON</h2>
+
+<!-- Nơi hiển thị JSON -->
+<pre id="cartDisplay">Loading...</pre>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let localCart = localStorage.getItem("cart");
+
+        if (localCart) {
+            // Gửi dữ liệu lên server qua POST
+            fetch('/user/cart-client', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ cartJson: localCart })
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Hiển thị JSON nhận từ server
+                document.getElementById("cartDisplay").textContent = data;
+            })
+            .catch(err => {
+                document.getElementById("cartDisplay").textContent = 'Error sending cart: ' + err;
+            });
+        } else {
+            document.getElementById("cartDisplay").textContent = 'Cart is empty';
+        }
+    });
+</script>
+</body>
+</html>

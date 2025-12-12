@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh Sửa Sản Phẩm</title>
+    <link rel="stylesheet" th:href="@{/css/admin-style.css}">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            padding: 2rem !important;
+            border-radius: 15px !important;
+            margin-bottom: 2rem !important;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3) !important;
+        }
+
+        .card-sh {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+            border-radius: 15px !important;
+            border: none !important;
+            background: white !important;
+        }
+
+        .card-body {
+            padding: 2.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+            outline: none;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .icon-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-label i {
+            color: #667eea;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.875rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-check {
+            padding-left: 0;
+        }
+
+        .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        .alert-message {
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            animation: slideIn 0.5s ease-out;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #667eea;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            transform: translateX(-5px);
+        }
+
+        .section-divider {
+            border-top: 2px solid #e0e0e0;
+            margin: 2rem 0;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input[type="file"].form-control {
+            padding: 0.5rem 1rem;
+        }
+
+        input[type="number"].form-control {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .current-image {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 3px solid #e0e0e0;
+            padding: 0.5rem;
+            background: white;
+        }
+
+        .image-preview-container {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .discount-info {
+            background: #e7f3ff;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin-top: 1rem;
+        }
+
+        .readonly-field {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div class="container p-4 mt-3">
+            <!-- Page Header -->
+            <div class="page-header text-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    Chỉnh Sửa Sản Phẩm
+                </h2>
+            </div>
+
+            <a href="/admin/products" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Quay lại sản phẩm
+            </a>
+
+            <div class="row">
+                <div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+                    <!-- Alert Messages -->
+                    <th:block th:if="${session.succMsg}">
+                        <div class="alert alert-success alert-message">
+                            <i class="fas fa-check-circle me-2" style="font-size: 1.25rem;"></i>
+                            <span>[[${session.succMsg}]]</span>
+                        </div>
+                        <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <th:block th:if="${session.errorMsg}">
+                        <div class="alert alert-danger alert-message">
+                            <i class="fas fa-exclamation-circle me-2" style="font-size: 1.25rem;"></i>
+                            <span>[[${session.errorMsg}]]</span>
+                        </div>
+                        <th:block th:text="${@commnServiceImpl.removeSessionMessage()}"></th:block>
+                    </th:block>
+
+                    <div class="card card-sh">
+                        <div class="card-body">
+                            <form id="editProductForm" action="/admin/updateProduct" method="post"
+                                enctype="multipart/form-data">
+                                <input type="hidden" name="id" th:value="${product.id}">
+
+                                <!-- Tiêu đề sản phẩm -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-heading"></i>
+                                        Tiêu đề sản phẩm
+                                    </label>
+                                    <input type="text" name="title" th:value="${product.title}" class="form-control"
+                                        placeholder="Nhập tiêu đề sản phẩm" required>
+                                </div>
+
+                                <!-- Mô tả -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-align-left"></i>
+                                        Mô tả
+                                    </label>
+                                    <textarea rows="4" class="form-control" name="description"
+                                        placeholder="Nhập mô tả sản phẩm" required>[[${product.description}]]</textarea>
+                                </div>
+
+                                <div class="section-divider"></div>
+
+                                <!-- Danh mục & Giá -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-layer-group"></i>
+                                            Danh mục
+                                        </label>
+                                        <select class="form-control form-select" name="categoryId" required>
+                                            <option th:value="${product.category.id}" selected>
+                                                [[${product.category.name}]] (Hiện tại)
+                                            </option>
+                                            <option disabled>──────────</option>
+                                            <option th:each="category : ${categories}" th:value="${category.id}"
+                                                th:text="${category.name}"
+                                                th:if="${category.id != product.category.id}">
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-dollar-sign"></i>
+                                            Giá (VND)
+                                        </label>
+                                        <input type="number" name="price" id="price" th:value="${product.price}"
+                                            class="form-control" placeholder="0.00" min="0.01" step="0.01" required>
+                                    </div>
+                                </div>
+
+                                <!-- Giảm giá & Giá sau giảm -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-percent"></i>
+                                            Giảm giá (%)
+                                        </label>
+                                        <input type="number" name="discount" id="discount"
+                                            th:value="${product.discount}" class="form-control" placeholder="0" min="0"
+                                            max="100" required>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label">
+                                            <i class="fas fa-tag"></i>
+                                            Giá sau giảm (VND)
+                                        </label>
+                                        <input type="number" id="discountPrice" readonly
+                                            th:value="${product.discountPrice}" class="form-control readonly-field"
+                                            placeholder="Tính tự động">
+                                    </div>
+                                </div>
+
+                                <div class="discount-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Giá sau giảm</strong> được tính tự động dựa trên Giá và phần trăm Giảm giá.
+                                </div>
+
+                                <div class="section-divider"></div>
+
+                                <!-- Trạng thái -->
+                                <div class="mb-4">
+                                    <label class="form-label icon-label required-field">
+                                        <i class="fas fa-toggle-on"></i>
+                                        Trạng thái
+                                    </label>
+                                    <div class="radio-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio"
+                                                th:checked="${product.isActive==true}" value="true" name="isActive"
+                                                id="statusActive">
+                                            <label class="form-check-label" for="statusActive">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                                Kích hoạt
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="isActive"
+                                                th:checked="${product.isActive==false}" value="false"
+                                                id="statusInactive">
+                                            <label class="form-check-label" for="statusInactive">
+                                                <i class="fas fa-times-circle text-danger"></i>
+                                                Không kích hoạt
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tồn kho & Hình ảnh -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label required-field">
+                                            <i class="fas fa-boxes"></i>
+                                            Số lượng tồn kho
+                                        </label>
+                                        <input type="number" name="stock" th:value="${product.stock}"
+                                            class="form-control" placeholder="0" min="0" step="1" required>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label icon-label">
+                                            <i class="fas fa-image"></i>
+                                            Cập nhật hình ảnh
+                                        </label>
+                                        <input type="file" name="file" class="form-control" accept="image/*">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Để trống nếu muốn giữ nguyên hình ảnh hiện tại
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Xem hình ảnh hiện tại -->
+                                <div class="image-preview-container mb-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Hình ảnh hiện tại
+                                    </label>
+                                    <div class="mt-2">
+                                        <img th:if="${product.image != null}"
+                                            th:src="${product.isImageUrl()} ? ${product.image} : @{'/img/product_img/' + ${product.image}}"
+                                            class="current-image" width="150px" height="150px"
+                                            alt="Hình ảnh sản phẩm hiện tại">
+                                        <img th:unless="${product.image != null}"
+                                            th:src="@{/img/product_img/default-product.jpg}" class="current-image"
+                                            alt="Hình ảnh sản phẩm mặc định" width="150px" height="150px">
+                                    </div>
+                                </div>
+
+                                <!-- Nút lưu -->
+                                <button type="submit" class="btn btn-primary btn-submit col-md-12 mt-3">
+                                    <i class="fas fa-save me-2"></i>
+                                    Cập nhật sản phẩm
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Auto calculate discount price
+        const priceInput = document.getElementById('price');
+        const discountInput = document.getElementById('discount');
+        const discountPriceInput = document.getElementById('discountPrice');
+
+        function calculateDiscountPrice() {
+            const price = parseFloat(priceInput.value) || 0;
+            const discount = parseFloat(discountInput.value) || 0;
+            const discountPrice = price - (price * discount / 100);
+            discountPriceInput.value = discountPrice.toFixed(2);
+        }
+
+        priceInput.addEventListener('input', calculateDiscountPrice);
+        discountInput.addEventListener('input', calculateDiscountPrice);
+
+        // Calculate on page load
+        calculateDiscountPrice();
+    </script>
+</body>
+
+</html>

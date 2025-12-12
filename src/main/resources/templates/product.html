@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{base::layout(~{::section})}">
+<head>
+    <meta charset="ISO-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <!-- Bootstrap CSS -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- Font Awesome -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
+    <!-- Custom Styles -->
+    <!-- <link rel="stylesheet" th:href="@{/css/style.css}"> -->
+</head>
+<body>
+    <section>
+        <!-- Search Bar Section -->
+        <div class="search-section py-4">
+            <div class="container-lg">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <form action="/products" method="get" class="search-form">
+                            <div class="input-group input-group-lg">
+                                <input type="text" class="form-control search-input" name="ch" 
+                                       placeholder="Tìm kiếm sản phẩm..." th:value="${ch}">
+                                <button class="btn btn-search" type="submit">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container-lg py-5">
+            <div class="row g-4">
+                <!-- Sidebar Filters -->
+                <div class="col-12 col-lg-3">
+                    <div class="filter-panel position-sticky" style="top: 90px; max-height: 80vh; overflow-y: auto;">
+                        <!-- Active Filters Display -->
+                        <div class="active-filters" th:if="${ch != null && ch != '' || paramValue != null && paramValue != '' || minPrice != null || maxPrice != null}">
+                            <h6 class="filter-section-title">Bộ lọc đang áp dụng</h6>
+                            <div class="filter-tags">
+                                <span class="filter-tag" th:if="${ch != null && ch != ''}">
+                                    <i class="fas fa-search"></i> [[${ch}]]
+                                    <a th:href="@{/products(category=${paramValue}, minPrice=${minPrice}, maxPrice=${maxPrice})}" class="tag-remove">✕</a>
+                                </span>
+                                <span class="filter-tag" th:if="${paramValue != null && paramValue != ''}">
+                                    <i class="fas fa-folder"></i> [[${paramValue}]]
+                                    <a th:href="@{/products(ch=${ch}, minPrice=${minPrice}, maxPrice=${maxPrice})}" class="tag-remove">✕</a>
+                                </span>
+                                <span class="filter-tag" th:if="${minPrice != null || maxPrice != null}">
+                                    <i class="fas fa-tag"></i> 
+                                    <span th:if="${minPrice != null}">₫[[${minPrice}]]</span>
+                                    <span th:if="${minPrice != null && maxPrice != null}"> - </span>
+                                    <span th:if="${maxPrice != null}">₫[[${maxPrice}]]</span>
+                                    <a th:href="@{/products(ch=${ch}, category=${paramValue})}" class="tag-remove">✕</a>
+                                </span>
+                                <a th:href="@{/products}" class="btn-clear-filters">
+                                    <i class="fas fa-times"></i> Xóa tất cả
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="filter-section">
+                            <h6 class="filter-section-title">Danh mục</h6>
+                            <div class="filter-list">
+                                <a th:href="@{/products(ch=${ch}, minPrice=${minPrice}, maxPrice=${maxPrice})}"
+                                   th:classappend="${paramValue==''} ? 'active':''" 
+                                   class="filter-item">
+                                    <i class="fas fa-th-large"></i>
+                                    <span>Tất cả sản phẩm</span>
+                                    <span class="filter-count">([[${sumCategory}]])</span>
+                                </a>
+                                <a th:each="c:${categories}" 
+                                   th:href="@{/products(category=${c.name}, ch=${ch}, minPrice=${minPrice}, maxPrice=${maxPrice})}" 
+                                   th:classappend="${paramValue == c.name} ? 'active':''" 
+                                   class="filter-item">
+                                    <i class="fas fa-folder"></i>
+                                    <span>[[${c.name}]]</span>
+                                     <span class="filter-count">([[${categoryProductCount[c.name] != null ? categoryProductCount[c.name] : 0}]])</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Price Range Filter -->
+                        <div class="filter-section">
+                            <h6 class="filter-section-title">Khoảng giá</h6>
+                            <form action="/products" method="get" class="price-filter-form">
+                                <input type="hidden" name="ch" th:value="${ch}">
+                                <input type="hidden" name="category" th:value="${paramValue}">
+                                
+                                <div class="price-input-group">
+                                    <div class="price-input">
+                                        <label for="minPrice" class="price-label">Từ</label>
+                                        <input type="number" id="minPrice" name="minPrice" 
+                                               class="form-control price-input-field" 
+                                               placeholder="0" min="0" th:value="${minPrice}">
+                                    </div>
+                                    <div class="price-input">
+                                        <label for="maxPrice" class="price-label">Đến</label>
+                                        <input type="number" id="maxPrice" name="maxPrice" 
+                                               class="form-control price-input-field" 
+                                               placeholder="999999999" th:value="${maxPrice}">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-filter-apply">
+                                    <i class="fas fa-check"></i> Áp dụng
+                                </button>
+                            </form>
+
+                            <!-- Quick Price Range -->
+                            <div class="quick-price-range">
+                                <a th:href="@{/products(category=${paramValue}, ch=${ch})}" class="price-range-link">
+                                    Tất cả giá
+                                </a>
+                                <a th:href="@{/products(category=${paramValue}, ch=${ch}, minPrice=0, maxPrice=100000)}" class="price-range-link">
+                                    ₫0 - ₫100K
+                                </a>
+                                <a th:href="@{/products(category=${paramValue}, ch=${ch}, minPrice=100000, maxPrice=500000)}" class="price-range-link">
+                                    ₫100K - ₫500K
+                                </a>
+                                <a th:href="@{/products(category=${paramValue}, ch=${ch}, minPrice=500000, maxPrice=1000000)}" class="price-range-link">
+                                    ₫500K - ₫1M
+                                </a>
+                                <a th:href="@{/products(category=${paramValue}, ch=${ch}, minPrice=1000000)}" class="price-range-link">
+                                    Trên ₫1M
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product List Section -->
+                <div class="col-12 col-lg-9">
+                    <div class="products-card">
+                        <div class="products-header">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                <h2 class="products-title">Sản phẩm nổi bật</h2>
+                                <span class="products-count">
+                                    <i class="fas fa-boxes"></i> Hiển thị [[${productsSize}]] / [[${totalElements}]] sản phẩm
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Products Grid -->
+                        <th:block th:if="${productsSize > 0}">
+                            <div class="products-grid">
+                                <div th:each="p:${products}" class="product-item">
+                                    <div class="product-card">
+                                        <div class="product-image-wrapper">
+                                            <img alt="${p.title}" 
+                                                 th:src="${p.isImageUrl()} ? ${p.image} : @{${p.getImageSource()}}" 
+                                                 class="product-image">
+                                            <span class="discount-badge" th:if="${p.discount > 0}">
+                                                <span class="badge-text">[[${p.discount}]]%</span>
+                                                <span class="badge-label">OFF</span>
+                                            </span>
+                                        </div>
+                                        <div class="product-content">
+                                            <h6 class="product-title">[[${p.title}]]</h6>
+                                            <div class="product-pricing">
+                                                <span class="price-current">₫[[${p.discountPrice}]]</span>
+                                                <span class="price-original" th:if="${p.discount > 0}">₫[[${p.price}]]</span>
+                                            </div>
+                                            <a th:href="@{'/product/'+${p.id}}" class="btn-view-details">
+                                                Xem chi tiết <i class="fas fa-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+
+                        <!-- Empty State -->
+                        <th:block th:unless="${productsSize > 0}">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox empty-state-icon"></i>
+                                <p class="empty-state-text">Không có sản phẩm nào</p>
+                                <p class="empty-state-subtitle">Vui lòng thay đổi bộ lọc hoặc thử từ khóa khác</p>
+                            </div>
+                        </th:block>
+
+                        <!-- Pagination -->
+                            <th:block th:if="${productsSize > 0}">
+                                <div class="pagination-section">
+                                    <div class="row align-items-center">
+                                        <div class="col-12">
+                                            <nav aria-label="Products pagination">
+                                                <ul class="pagination-custom">
+                                                    <th:block th:with="minP=${minPrice != null ? minPrice : ''}, maxP=${maxPrice != null ? maxPrice : ''}">
+                                                        <li th:classappend="${isFirst} ? 'disabled':''">
+                                                            <a th:href="@{'/products?pageNo='+${pageNo-1}+'&ch='+${ch}+'&category='+${paramValue}+'&minPrice='+${minP}+'&maxPrice='+${maxP}}"
+                                                               class="pagination-link"
+                                                               aria-label="Previous">
+                                                                <i class="fas fa-chevron-left"></i>
+                                                            </a>
+                                                        </li>
+                                                        <li th:each="i:${#numbers.sequence(1,totalPages)}" 
+                                                            th:classappend="${pageNo+1==i} ? 'active':''">
+                                                            <a class="pagination-link" 
+                                                               th:href="@{'/products?pageNo='+${i-1}+'&ch='+${ch}+'&category='+${paramValue}+'&minPrice='+${minP}+'&maxPrice='+${maxP}}">
+                                                                [[${i}]]
+                                                            </a>
+                                                        </li>
+                                                        <li th:classappend="${isLast} ? 'disabled':''">
+                                                            <a th:href="@{'/products?pageNo='+${pageNo+1}+'&ch='+${ch}+'&category='+${paramValue}+'&minPrice='+${minP}+'&maxPrice='+${maxP}}"
+                                                               class="pagination-link"
+                                                               aria-label="Next">
+                                                                <i class="fas fa-chevron-right"></i>
+                                                            </a>
+                                                        </li>
+                                                    </th:block>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
