@@ -701,7 +701,7 @@ public class AdminController {
         return "redirect:/admin/profile";
     }
 
-    //Update Admin by BaoThong
+
     private UserDtls getLoggedInUserDetails(Principal p) {
         String email = p.getName();
         UserDtls userDtls = userService.getUserByEmail(email);
